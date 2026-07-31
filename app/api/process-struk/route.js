@@ -1,20 +1,12 @@
 import { NextResponse } from 'next/server';
-import Tesseract from 'tesseract.js';
 
 export async function POST(request) {
   try {
-    const formData = await request.formData();
-    const file = formData.get('image');
+    const { text } = await request.json();
 
-    if (!file) {
-      return NextResponse.json({ error: 'Foto tidak ditemukan' }, { status: 400 });
+    if (!text) {
+      return NextResponse.json({ error: 'Teks tidak ditemukan' }, { status: 400 });
     }
-
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
-    // Proses OCR membaca teks pada foto
-    const { data: { text } } = await Tesseract.recognize(buffer, 'ind');
 
     let rekap = {
       mobil: { jml: 0, total: 0 },
@@ -55,7 +47,6 @@ export async function POST(request) {
 
     return NextResponse.json({
       success: true,
-      rawText: text,
       rekap,
       grandTotal
     });
